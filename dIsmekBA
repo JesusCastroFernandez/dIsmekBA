@@ -1,0 +1,46 @@
+import numpy as np
+from fractions import Fraction
+
+def shor_adapted(N):
+    # Paso 1: Elección aleatoria del número a
+    a = np.random.randint(2, N)
+
+    # Paso 2: Calcular el máximo común divisor entre a y N
+    gcd = np.gcd(a, N)
+    if gcd > 1:
+        return gcd  # Encontramos un factor no trivial, retornar
+
+    # Paso 3: Calcular el periodo r utilizando la transformada cuántica de Fourier
+    r = find_period(a, N)
+
+    # Paso 4: Verificar si r es par e (a^(r/2) + 1) mod N ≠ 0
+    if r % 2 == 0:
+        x = int(a**(r/2) % N)
+        if (x + 1) % N != 0:
+            factor_1 = np.gcd(x + 1, N)
+            factor_2 = np.gcd(x - 1, N)
+            if factor_1 != 1 and factor_2 != 1:
+                return factor_1, factor_2
+
+    return None  # No se encontraron factores
+
+def find_period(a, N):
+    # Implementación de la transformada cuántica de Fourier para encontrar el periodo
+    period = 1
+    x = a % N
+
+    while True:
+        x = (x * a) % N
+        period += 1
+
+        if x == 1:
+            return period
+
+# Ejemplo de uso
+N = 15
+
+result = shor_adapted(N)
+if result is None:
+    print("No se encontraron factores no triviales.")
+else:
+    print("Factores encontrados:", result)
